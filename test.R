@@ -95,3 +95,6 @@ fit <- lm(ViolentCrimesPerPop~.,data=train)
 summary(fit)
           
 Rsquared(fit,test,test$ViolentCrimesPerPop)
+
+
+
