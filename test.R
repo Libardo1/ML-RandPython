@@ -91,10 +91,84 @@ train_idx <- trainTestSplit(crimesDF2,trainPercent=75,seed=5)
 train <- crimesDF2[train_idx, ]
 test <- crimesDF2[-train_idx, ]
 
-fit <- lm(ViolentCrimesPerPop~.,data=train)
+fit <- lm(ViolentCrimesPerPop~poly(names(train)[1:122],2),data=train)
+fit <- lm(ViolentCrimesPerPop~poly(as.matrix(train[1:120],2)),data=train)
+fit.2 <- lm(ViolentCrimesPerPop~.,data=train)
 summary(fit)
           
 Rsquared(fit,test,test$ViolentCrimesPerPop)
 
 
+####################################################
+
+
+x=as.matrix(crimesDF2[1:122])
+poly(x,2)
+fit <- lm(ViolentCrimesPerPop~poly(as.matrix(train[1:10]),2),data=train)
+
+
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+train_idx <- trainTestSplit(df,trainPercent=75,seed=5)
+train <- df[train_idx, ]
+test <- df[-train_idx, ]
+
+
+fit=lm(medv~.,data=df)
+fit
+
+x=as.matrix(df[1:length(df)-1])
+X_poly=poly(x,2,raw=TRUE)
+fit <- lm(medv~ poly(x,2,raw=TRUE),data=df)
+
+
+
+#####################################
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+df1 = as.matrix(df[1:14])
+train_idx <- trainTestSplit(df,trainPercent=75,seed=5)
+train <- df[train_idx, ]
+test <- df[-train_idx, ]
+
+
+x_train=as.matrix(train[1:length(train)-1])
+X_train_poly=poly(x_train,2,raw=TRUE)
+fit <- lm(medv~ X_train_poly,data=train)
+summary(fit)
+
+
+x_test=as.matrix(test[1:length(test)-1])
+X_test_poly=poly(x_test,2,raw=TRUE)
+Rsquared(fit,X_test_poly,test$medv)
+
+yhat <- predict(fit,newdata=test)
+RSS <- sum((y - yhat)^2)
+TSS <- sum((y - mean(y))^2)
+rsquared <-1 - (RSS/TSS)
+rsquared
+
+
+#**************************************
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+x = as.matrix(df[1:14])
+# Make poly of total Data frame before split
+df1=as.data.frame(poly(x,2,raw=TRUE))
+df2 <- cbind(df1,df[15])
+train_idx <- trainTestSplit(df2,trainPercent=75,seed=5)
+train <- df2[train_idx, ]
+test <- df2[-train_idx, ]
+# Fir the 
+fit <- lm(medv~as.matrix(train[1:135]) ,data=train)
+summary(fit)
+
+
+x_test=as.matrix(test[1:length(test)-1])
+X_test_poly=poly(x_test,2,raw=TRUE)
+# Since predict requires same name assign as follows
+train=test
+Rsquared(fit,train,test$medv)
+
+yhat <- predict(fit,newdata=train)
+RSS <- sum((y - yhat)^2)
+TSS <- sum((y - mean(y))^2)
+rsquared <-1 - (RSS/TSS)
 
