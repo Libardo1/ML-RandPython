@@ -66,19 +66,32 @@ Rsquared <- function(lmfit,newdf,y){
 #########################################
 #All data
 
-crimesDF <- read.csv("communities_data.csv")
+#crimesDF <- read.csv("communities_data.csv")
 b <- read.table("names.txt",header=FALSE,sep=" ")
 b1 <-as.character(b[,2])
 
 names(crimesDF) <- b1
 write.csv(crimesDF,file="crimes.csv")
+
+##################
 crimesDF <- read.csv("crimes.csv",stringsAsFactors = FALSE)
 names(crimesDF)
+#crimesDF1 <- sapply(crimesDF,as.numeric)
 crimesDF1 <- crimesDF[,7:length(crimesDF)]
 
-train_idx <- trainTestSplit(crimesDF1,trainPercent=75,seed=5)
-train <- crimesDF1[train_idx, ]
-test <- crimesDF1[-train_idx, ]
+# Conert all to numeric
+crimesDF2 <- sapply(crimesDF1,as.numeric)
 
-fit <- lm(ViolentCrimesPerPop~.,data=crimesDF1)
+# Check for NAs
+a <- is.na(crimesDF2)
+# Set to 0 as an imputation
+crimesDF2[a] <-0
+crimesDF2 <- as.data.frame(crimesDF2)
+train_idx <- trainTestSplit(crimesDF2,trainPercent=75,seed=5)
+train <- crimesDF2[train_idx, ]
+test <- crimesDF2[-train_idx, ]
+
+fit <- lm(ViolentCrimesPerPop~.,data=train)
+summary(fit)
+          
 Rsquared(fit,test,test$ViolentCrimesPerPop)
