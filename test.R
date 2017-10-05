@@ -188,19 +188,76 @@ Rsquared(fit,train,test$medv)
 
 
 ######################################################
+#Poly-1
 df=read.csv("auto_mpg.csv",stringsAsFactors = FALSE) # Data from UCI
 df1 <- as.data.frame(sapply(df,as.numeric))
 
 df2 <- df1 %>% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
-
-train_idx <- trainTestSplit(df2,trainPercent=75,seed=5)
-train <- df2[train_idx, ]
-test <- df2[-train_idx, ]
+df3 <- df2[complete.cases(df2),]
+train_idx <- trainTestSplit(df3,trainPercent=75,seed=5)
+train <- df3[train_idx, ]
+test <- df3[-train_idx, ]
 # Fit the 
 fit <- lm(mpg~. ,data=train)
 summary(fit)
 
-
-
 train=test
 Rsquared(fit,test,test$mpg)
+
+################
+#poly 2
+x = as.matrix(df3[1:6])
+# Make poly of total Data frame before split
+df4=as.data.frame(poly(x,2,raw=TRUE))
+df5 <- cbind(df4,df3[7])
+train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
+train <- df5[train_idx, ]
+test <- df5[-train_idx, ]
+# Fir the 
+fit <- lm(mpg~. ,data=train)
+summary(fit)
+
+
+# Since predict requires same name assign as follows
+train=test
+Rsquared(fit,train,test$mpg)
+
+#####
+#poly 3
+x = as.matrix(df3[1:6])
+# Make poly of total Data frame before split
+df4=as.data.frame(poly(x,3,raw=TRUE))
+df5 <- cbind(df4,df3[7])
+train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
+train <- df5[train_idx, ]
+test <- df5[-train_idx, ]
+# Fir the 
+fit <- lm(mpg~. ,data=train)
+summary(fit)
+Rsquared(fit,test,test$mpg)
+
+
+# Since predict requires same name assign as follows
+train=test
+Rsquared(fit,train,test$mpg)
+
+
+######################
+#####
+#poly 5
+x = as.matrix(df3[1:6])
+# Make poly of total Data frame before split
+df4=as.data.frame(poly(x,5,raw=TRUE))
+df5 <- cbind(df4,df3[7])
+train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
+train <- df5[train_idx, ]
+test <- df5[-train_idx, ]
+# Fir the 
+fit <- lm(mpg~. ,data=train)
+summary(fit)
+Rsquared(fit,test,test$mpg)
+
+
+# Since predict requires same name assign as follows
+train=test
+Rsquared(fit,train,test$mpg)
