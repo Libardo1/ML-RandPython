@@ -8,9 +8,7 @@ library(dplyr)
 trainTestSplit <- function(df,trainPercent,seed1){
     ## Sample size percent
     samp_size <- floor(trainPercent/100 * nrow(df))
-    
-    ## set the seed to make your partition reproductible
-    ## set the seed to make your partition reproductible
+    ## set the seed 
     set.seed(seed1)
     idx <- sample(seq_len(nrow(df)), size = samp_size)
     idx

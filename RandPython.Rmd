@@ -8,26 +8,7 @@ output:
 ---
 
 ```{r}
-trainTestSplit <- function(df,trainPercent,seed1){
-    ## Sample size percent
-    samp_size <- floor(trainPercent/100 * nrow(df))
-    
-    ## set the seed to make your partition reproductible
-    ## set the seed to make your partition reproductible
-    set.seed(seed1)
-    idx <- sample(seq_len(nrow(df)), size = samp_size)
-    idx
-
-}
-
-Rsquared <- function(lmfit,newdf,y){
-  yhat <- predict(lmfit,newdata=newdf)
-  RSS <- sum((y - yhat)^2)
-  TSS <- sum((y - mean(y))^2)
-  rsquared <-1 - (RSS/TSS)
-  rsquared
-}
-
+source("RFunctions.R")
 
 df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
 train_idx <- trainTestSplit(df,trainPercent=75,seed=5)
@@ -51,6 +32,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 os.chdir("C:\\software\\machine-learning\\RandPython")
 df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
 X=df['lstat']
@@ -58,7 +40,7 @@ y=df['medv']
 X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
 X_train=X_train.values.reshape(-1,1)
 X_test=X_test.values.reshape(-1,1)
-from sklearn.linear_model import LinearRegression
+
 
 linreg = LinearRegression().fit(X_train, y_train)
 print('linear model coeff (w): {}'
@@ -88,29 +70,9 @@ Output image:
 
 
 
-```{r}
-trainTestSplit <- function(df,trainPercent,seed1){
-    ## Sample size percent
-    samp_size <- floor(trainPercent/100 * nrow(df))
-    
-    ## set the seed to make your partition reproductible
-    ## set the seed to make your partition reproductible
-    set.seed(seed1)
-    idx <- sample(seq_len(nrow(df)), size = samp_size)
-    idx
-
-}
-
-Rsquared <- function(lmfit,newdf,y){
-  yhat <- predict(lmfit,newdata=newdf)
-  RSS <- sum((y - yhat)^2)
-  TSS <- sum((y - mean(y))^2)
-  rsquared <-1 - (RSS/TSS)
-  rsquared
-}
+```{r message=FALSE, warning=FALSE}
 crimesDF <- read.csv("crimes.csv",stringsAsFactors = FALSE)
-names(crimesDF)
-#crimesDF1 <- sapply(crimesDF,as.numeric)
+
 crimesDF1 <- crimesDF[,7:length(crimesDF)]
 
 # Conert all to numeric
@@ -125,15 +87,35 @@ train_idx <- trainTestSplit(crimesDF2,trainPercent=75,seed=5)
 train <- crimesDF2[train_idx, ]
 test <- crimesDF2[-train_idx, ]
 
-fit <- lm(ViolentCrimesPerPop~poly(names(train)[1:122],2),data=train)
-fit <- lm(ViolentCrimesPerPop~poly(as.matrix(train[1:120],2)),data=train)
-fit.2 <- lm(ViolentCrimesPerPop~.,data=train)
-summary(fit)
-          
-#Rsquared(fit,test,test$ViolentCrimesPerPop)
+
+fit <- lm(ViolentCrimesPerPop~.,data=train)
+Rsquared(fit,test,test$ViolentCrimesPerPop)
 
 ```
 
+
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+crimesDF =pd.read_csv("crimes.csv",encoding="ISO-8859-1")
+crimesDF1=crimesDF.iloc[:,7:crimesDF.shape[1]]
+crimesDF2 = crimesDF1.apply(pd.to_numeric, errors='coerce')
+crimesDF2.fillna(0, inplace=True)
+X=crimesDF2.iloc[:,0:120]
+y=crimesDF2.iloc[:,121]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
+linreg = LinearRegression().fit(X_train, y_train)
+
+print('R-squared score (training): {:.3f}'
+     .format(linreg.score(X_train, y_train)))
+print('R-squared score (test): {:.3f}'
+     .format(linreg.score(X_test, y_test)))
+```
 
 
 
