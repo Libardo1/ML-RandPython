@@ -244,15 +244,38 @@ Rsquared(fit,train,test$mpg)
 
 ######################
 #####
-#poly 5
-x = as.matrix(df3[1:6])
-# Make poly of total Data frame before split
-df4=as.data.frame(poly(x,5,raw=TRUE))
-df5 <- cbind(df4,df3[7])
-train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
-train <- df5[train_idx, ]
-test <- df5[-train_idx, ]
+
+
+train_idx <- trainTestSplit(df3,trainPercent=75,seed=5)
+train <- df3[train_idx, ]
+test <- df3[-train_idx, ]
 # Fir the 
+train.X=train[,1:6]
+train.Y=train[,7]
+test.X=test[,1:6]
+test.Y=test[,7]
+for(i in 1:4){
+    knn=knn.reg(train.X,test.X,train.Y,k=i)
+    a=knnRSquared(knn$pred,test.Y)
+    print(a)
+}
+
+knn=knn.reg(train.X,test.X,train.Y,k=4)
+
+#RSS <- sum((y - yhat)^2)
+#TSS <- sum((y - mean(y))^2)
+#rsquared <-1 - (RSS/TSS)
+#rsquared
+
+knnRSquared <- function(yhat=knn$pred,y){
+    RSS <- sum((test.Y - yhat)^2)
+    TSS <- sum((test.Y - mean(test.Y))^2)
+    rsquared <-1 - (RSS/TSS)
+    rsquared
+}
+
+knnRSquared(knn$pred,test.Y)
+
 fit <- lm(mpg~. ,data=train)
 summary(fit)
 Rsquared(fit,test,test$mpg)
@@ -261,3 +284,32 @@ Rsquared(fit,test,test$mpg)
 # Since predict requires same name assign as follows
 train=test
 Rsquared(fit,train,test$mpg)
+
+
+ranges <- sapply(train_set, function(x) max(x)-min(x))
+
+minx=sapply(train.X, function(x) min(x))
+maxx=sapply(train.X, function(x) max(x))
+xstd=sapply(train.X, function(x) (x-minx)/(maxx-minx))
+
+minx=sapply(train.X,min)
+maxx=sapply(train.X,max)
+a=maxx-minx
+t1 <- train.X[1:4,]
+b=maxx-minx
+t2=t1-minx
+d=(t(t1) -minx)/(maxx-minx)
+t(d)
+train.X <- t(t(train.X) / c)
+
+
+MinMaxScaler <- function(df){
+    minx=sapply(df,min)
+    maxx=sapply(df,max)
+    d=(t(df) -minx)/(maxx-minx)
+    e=t(d)
+    e
+}
+
+m=MinMaxScaler(train.X)
+n=MinMaxScaler(test.X)
