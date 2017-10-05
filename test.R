@@ -286,21 +286,7 @@ train=test
 Rsquared(fit,train,test$mpg)
 
 
-ranges <- sapply(train_set, function(x) max(x)-min(x))
 
-minx=sapply(train.X, function(x) min(x))
-maxx=sapply(train.X, function(x) max(x))
-xstd=sapply(train.X, function(x) (x-minx)/(maxx-minx))
-
-minx=sapply(train.X,min)
-maxx=sapply(train.X,max)
-a=maxx-minx
-t1 <- train.X[1:4,]
-b=maxx-minx
-t2=t1-minx
-d=(t(t1) -minx)/(maxx-minx)
-t(d)
-train.X <- t(t(train.X) / c)
 
 
 MinMaxScaler <- function(df){
@@ -311,5 +297,13 @@ MinMaxScaler <- function(df){
     e
 }
 
-m=MinMaxScaler(train.X)
-n=MinMaxScaler(test.X)
+train.X.scaled=MinMaxScaler(train.X)
+test.X.scaled=MinMaxScaler(test.X)
+
+knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=11)
+knnRSquared(knn$pred,test.Y)
+for(i in c(1,2,4,6,8,10,12,15,20,25,30)){
+    knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=i)
+    a=knnRSquared(knn$pred,test.Y)
+    print(a)
+}
