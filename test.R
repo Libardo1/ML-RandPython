@@ -169,6 +169,38 @@ Rsquared(fit,train,test$medv)
 
 yhat <- predict(fit,newdata=train)
 RSS <- sum((y - yhat)^2)
-TSS <- sum((y - mean(y))^2)
-rsquared <-1 - (RSS/TSS)
 
+#####################################################################
+#**************************************
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+
+train_idx <- trainTestSplit(df,trainPercent=75,seed=5)
+train <- df[train_idx, ]
+test <- df[-train_idx, ]
+# Fir the 
+fit <- lm(medv~. ,data=train)
+summary(fit)
+
+
+
+train=test
+Rsquared(fit,train,test$medv)
+
+
+######################################################
+df=read.csv("auto_mpg.csv",stringsAsFactors = FALSE) # Data from UCI
+df1 <- as.data.frame(sapply(df,as.numeric))
+
+df2 <- df1 %>% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
+
+train_idx <- trainTestSplit(df2,trainPercent=75,seed=5)
+train <- df2[train_idx, ]
+test <- df2[-train_idx, ]
+# Fit the 
+fit <- lm(mpg~. ,data=train)
+summary(fit)
+
+
+
+train=test
+Rsquared(fit,test,test$mpg)

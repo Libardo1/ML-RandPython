@@ -88,6 +88,51 @@ Output image:
 
 
 
+```{r}
+trainTestSplit <- function(df,trainPercent,seed1){
+    ## Sample size percent
+    samp_size <- floor(trainPercent/100 * nrow(df))
+    
+    ## set the seed to make your partition reproductible
+    ## set the seed to make your partition reproductible
+    set.seed(seed1)
+    idx <- sample(seq_len(nrow(df)), size = samp_size)
+    idx
+
+}
+
+Rsquared <- function(lmfit,newdf,y){
+  yhat <- predict(lmfit,newdata=newdf)
+  RSS <- sum((y - yhat)^2)
+  TSS <- sum((y - mean(y))^2)
+  rsquared <-1 - (RSS/TSS)
+  rsquared
+}
+crimesDF <- read.csv("crimes.csv",stringsAsFactors = FALSE)
+names(crimesDF)
+#crimesDF1 <- sapply(crimesDF,as.numeric)
+crimesDF1 <- crimesDF[,7:length(crimesDF)]
+
+# Conert all to numeric
+crimesDF2 <- sapply(crimesDF1,as.numeric)
+
+# Check for NAs
+a <- is.na(crimesDF2)
+# Set to 0 as an imputation
+crimesDF2[a] <-0
+crimesDF2 <- as.data.frame(crimesDF2)
+train_idx <- trainTestSplit(crimesDF2,trainPercent=75,seed=5)
+train <- crimesDF2[train_idx, ]
+test <- crimesDF2[-train_idx, ]
+
+fit <- lm(ViolentCrimesPerPop~poly(names(train)[1:122],2),data=train)
+fit <- lm(ViolentCrimesPerPop~poly(as.matrix(train[1:120],2)),data=train)
+fit.2 <- lm(ViolentCrimesPerPop~.,data=train)
+summary(fit)
+          
+#Rsquared(fit,test,test$ViolentCrimesPerPop)
+
+```
 
 
 
