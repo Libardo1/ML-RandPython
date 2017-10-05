@@ -123,9 +123,19 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>source(&quot;RFunctions.R&quot;)
-
-df=read.csv(&quot;Boston.csv&quot;,stringsAsFactors = FALSE) # Data from MASS - SL
+<pre class="r"><code>source(&quot;RFunctions.R&quot;)</code></pre>
+<pre><code>## Warning: package 'dplyr' was built under R version 3.4.2</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre><code>## Warning: package 'ggplot2' was built under R version 3.4.2</code></pre>
+<pre><code>## Warning: package 'FNN' was built under R version 3.4.2</code></pre>
+<pre class="r"><code>df=read.csv(&quot;Boston.csv&quot;,stringsAsFactors = FALSE) # Data from MASS - SL
 train_idx &lt;- trainTestSplit(df,trainPercent=75,seed=5)
 train &lt;- df[train_idx, ]
 test &lt;- df[-train_idx, ]
@@ -251,6 +261,152 @@ print('R-squared score (test): {:.3f}'
      .format(linreg.score(X_test, y_test)))</code></pre>
 <pre><code>## R-squared score (training): 0.699
 ## R-squared score (test): 0.677</code></pre>
+<pre class="r"><code>df=read.csv(&quot;auto_mpg.csv&quot;,stringsAsFactors = FALSE) # Data from UCI
+df1 &lt;- as.data.frame(sapply(df,as.numeric))
+
+df2 &lt;- df1 %&gt;% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
+df3 &lt;- df2[complete.cases(df2),]
+train_idx &lt;- trainTestSplit(df3,trainPercent=75,seed=5)
+train &lt;- df3[train_idx, ]
+test &lt;- df3[-train_idx, ]
+# Fit the 
+fit &lt;- lm(mpg~. ,data=train)
+Rsquared(fit,test,test$mpg)</code></pre>
+<pre><code>## [1] 0.763607</code></pre>
+<pre class="r"><code>#poly 2
+x = as.matrix(df3[1:6])
+# Make poly of total Data frame before split
+df4=as.data.frame(poly(x,2,raw=TRUE))
+df5 &lt;- cbind(df4,df3[7])
+train_idx &lt;- trainTestSplit(df5,trainPercent=75,seed=5)
+train &lt;- df5[train_idx, ]
+test &lt;- df5[-train_idx, ]
+# Fir the 
+fit &lt;- lm(mpg~. ,data=train)
+Rsquared(fit,test,test$mpg)</code></pre>
+<pre><code>## [1] 0.8313722</code></pre>
+<pre class="r"><code>#####
+#poly 3
+x = as.matrix(df3[1:6])
+# Make poly of total Data frame before split
+df4=as.data.frame(poly(x,3,raw=TRUE))
+df5 &lt;- cbind(df4,df3[7])
+train_idx &lt;- trainTestSplit(df5,trainPercent=75,seed=5)
+train &lt;- df5[train_idx, ]
+test &lt;- df5[-train_idx, ]
+# Fir the 
+fit &lt;- lm(mpg~. ,data=train)
+Rsquared(fit,test,test$mpg)</code></pre>
+<pre><code>## [1] 0.7732245</code></pre>
+<pre class="python"><code>import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+autoDF =pd.read_csv(&quot;auto_mpg.csv&quot;,encoding=&quot;ISO-8859-1&quot;)
+autoDF.shape
+autoDF.columns
+autoDF1=autoDF[['mpg','cylinder','displacement','horsepower','weight','acceleration','year']]
+autoDF2 = autoDF1.apply(pd.to_numeric, errors='coerce')
+autoDF3=autoDF2.dropna()
+autoDF3.shape
+X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
+y=autoDF3['mpg']
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
+
+# Poly2
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y,random_state = 0)
+linreg = LinearRegression().fit(X_train, y_train)
+
+print('(poly deg 2) R-squared score (training): {:.3f}'
+     .format(linreg.score(X_train, y_train)))
+print('(poly deg 2) R-squared score (test): {:.3f}\n'
+     .format(linreg.score(X_test, y_test)))
+
+#Polynomial 3
+
+poly = PolynomialFeatures(degree=3)
+X_poly = poly.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y,random_state = 0)
+linreg = LinearRegression().fit(X_train, y_train)
+print('(poly deg 3) R-squared score (training): {:.3f}'
+     .format(linreg.score(X_train, y_train)))
+print('(poly deg 3) R-squared score (test): {:.3f}\n'
+     .format(linreg.score(X_test, y_test)))
+</code></pre>
+<pre><code>## (poly deg 2) R-squared score (training): 0.861
+## (poly deg 2) R-squared score (test): 0.847
+## 
+## (poly deg 3) R-squared score (training): 0.933
+## (poly deg 3) R-squared score (test): 0.710</code></pre>
+<pre class="r"><code># knn.reg requires the FNN package
+df=read.csv(&quot;auto_mpg.csv&quot;,stringsAsFactors = FALSE) # Data from UCI
+df1 &lt;- as.data.frame(sapply(df,as.numeric))</code></pre>
+<pre><code>## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion
+
+## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion
+
+## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion</code></pre>
+<pre class="r"><code>df2 &lt;- df1 %&gt;% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
+df3 &lt;- df2[complete.cases(df2),]
+
+train_idx &lt;- trainTestSplit(df3,trainPercent=75,seed=5)
+train &lt;- df3[train_idx, ]
+test &lt;- df3[-train_idx, ]
+# Fir the 
+train.X=train[,1:6]
+train.Y=train[,7]
+test.X=test[,1:6]
+test.Y=test[,7]
+for(i in c(1,2,4,8,10,14,20)){
+    knn=knn.reg(train.X,test.X,train.Y,k=i)
+    a=knnRSquared(knn$pred,test.Y)
+    print(a)
+    
+}</code></pre>
+<pre><code>## [1] 0.6405203
+## [1] 0.6547812
+## [1] 0.6618883
+## [1] 0.6825792
+## [1] 0.6742179
+## [1] 0.6763066
+## [1] 0.694644</code></pre>
+<pre class="python"><code>import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+autoDF =pd.read_csv(&quot;auto_mpg.csv&quot;,encoding=&quot;ISO-8859-1&quot;)
+autoDF.shape
+autoDF.columns
+autoDF1=autoDF[['mpg','cylinder','displacement','horsepower','weight','acceleration','year']]
+autoDF2 = autoDF1.apply(pd.to_numeric, errors='coerce')
+autoDF3=autoDF2.dropna()
+autoDF3.shape
+X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
+y=autoDF3['mpg']
+from sklearn.neighbors import KNeighborsRegressor
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+
+for neighbors in [1,2,4,8,10,14,20]:
+     knnreg = KNeighborsRegressor(n_neighbors = neighbors).fit(X_train, y_train)
+     #print(knnreg.predict(X_test))
+     print('R-squared test score: {:.3f}'
+        .format(knnreg.score(X_test, y_test)))</code></pre>
+<pre><code>## R-squared test score: 0.527
+## R-squared test score: 0.678
+## R-squared test score: 0.707
+## R-squared test score: 0.684
+## R-squared test score: 0.683
+## R-squared test score: 0.670
+## R-squared test score: 0.668</code></pre>
 
 
 
