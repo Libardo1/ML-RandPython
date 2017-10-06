@@ -255,12 +255,26 @@ train.X=train[,1:6]
 train.Y=train[,7]
 test.X=test[,1:6]
 test.Y=test[,7]
+
 for(i in 1:4){
     knn=knn.reg(train.X,test.X,train.Y,k=i)
-    a=knnRSquared(knn$pred,test.Y)
-    print(a)
+    rsquared[i]=knnRSquared(knn$pred,test.Y)
+    
 }
+rsquared <- NULL
+neighbors <-c(1,2,4,8,10,14)
+for(i in seq_along(neighbors)){
+    knn=knn.reg(train.X,test.X,train.Y,k=neighbors[i])
+    rsquared[i]=knnRSquared(knn$pred,test.Y)
+    print(i)
+    
+}
+rsquared
+df <- data.frame(neighbors,Rsquared=rsquared)
 
+ggplot(df,aes(x=neighbors,y=Rsquared)) + geom_point() +geom_line(color="blue") +
+    xlab("Number of neighbors") + ylab("R squared") +
+    ggtitle("KNN regression - R squared vs Number of Neighors (Unnormalized)")
 knn=knn.reg(train.X,test.X,train.Y,k=4)
 
 #RSS <- sum((y - yhat)^2)

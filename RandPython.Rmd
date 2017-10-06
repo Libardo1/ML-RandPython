@@ -265,12 +265,20 @@ train.X=train[,1:6]
 train.Y=train[,7]
 test.X=test[,1:6]
 test.Y=test[,7]
-for(i in c(1,2,4,8,10,14,20)){
-    knn=knn.reg(train.X,test.X,train.Y,k=i)
-    a=knnRSquared(knn$pred,test.Y)
-    print(a)
+rsquared <- NULL
+neighbors <-c(1,2,4,8,10,14)
+for(i in seq_along(neighbors)){
+    knn=knn.reg(train.X,test.X,train.Y,k=neighbors[i])
+    rsquared[i]=knnRSquared(knn$pred,test.Y)
+    print(i)
     
 }
+rsquared
+df <- data.frame(neighbors,Rsquared=rsquared)
+
+ggplot(df,aes(x=neighbors,y=Rsquared)) + geom_point() +geom_line(color="blue") +
+    xlab("Number of neighbors") + ylab("R squared") +
+    ggtitle("KNN regression - R squared vs Number of Neighors (Unnormalized)")
 ```
 
 
@@ -296,9 +304,8 @@ y=autoDF3['mpg']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
 
-for neighbors in [1,2,4,8,10,14,20]:
+for neighbors in [1,2,4,8,10,14]:
      knnreg = KNeighborsRegressor(n_neighbors = neighbors).fit(X_train, y_train)
-     #print(knnreg.predict(X_test))
      print('R-squared test score: {:.3f}'
         .format(knnreg.score(X_test, y_test)))
 ```
