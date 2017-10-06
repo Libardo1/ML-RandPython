@@ -200,7 +200,8 @@ fit <- lm(mpg~. ,data=train)
 summary(fit)
 
 train=test
-Rsquared(fit,test,test$mpg)
+rsquared1=Rsquared(fit,test,test$mpg)
+sprintf("R-squared for multi-variate regression is : %f", rsquared1)
 
 ################
 #poly 2
@@ -218,8 +219,8 @@ summary(fit)
 
 # Since predict requires same name assign as follows
 train=test
-Rsquared(fit,train,test$mpg)
-
+rsquared2=Rsquared(fit,train,test$mpg)
+rsquared2
 #####
 #poly 3
 x = as.matrix(df3[1:6])
@@ -231,15 +232,17 @@ train <- df5[train_idx, ]
 test <- df5[-train_idx, ]
 # Fir the 
 fit <- lm(mpg~. ,data=train)
-summary(fit)
-Rsquared(fit,test,test$mpg)
+
+rsquared3=Rsquared(fit,test,test$mpg)
+rsquared3
 
 
-# Since predict requires same name assign as follows
-train=test
-Rsquared(fit,train,test$mpg)
 
+df=data.frame(degree=c(1,2,3),Rsquared=c(rsquared1,rsquared2,rsquared3))
 
+ggplot(df,aes(x=degree,y=Rsquared)) +geom_point() + geom_line(color="blue") +
+    ggtitle("Polynomial regression - R squared vs Degree of polynomial") +
+    xlab("Degree") + ylab("R squared")
 ######################
 #####
 
@@ -305,3 +308,6 @@ for(i in c(1,2,4,6,8,10,12,15,20,25,30)){
     a=knnRSquared(knn$pred,test.Y)
     print(a)
 }
+
+
+

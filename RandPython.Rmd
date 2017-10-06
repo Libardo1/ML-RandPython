@@ -6,6 +6,9 @@ output:
   html_document: default
   word_document: default
 ---
+## Univariate Regression - R code
+
+
 
 ```{r}
 source("RFunctions.R")
@@ -26,6 +29,10 @@ abline(fit,lwd=3)
 abline(fit,lwd=3,col="red")
 ```
 
+
+## Univariate Regression - Python code
+
+## R code
 ```{python}
 import numpy as np
 import pandas as pd
@@ -68,6 +75,7 @@ print "finished"
 Output image:
 ![output](foo.png)
 
+## Multivariate Regression - R code
 
 
 ```{r a,message=FALSE, warning=FALSE}
@@ -89,11 +97,11 @@ test <- crimesDF2[-train_idx, ]
 
 
 fit <- lm(ViolentCrimesPerPop~.,data=train)
-Rsquared(fit,test,test$ViolentCrimesPerPop)
-
+rsquared=Rsquared(fit,test,test$ViolentCrimesPerPop)
+sprintf("R-squared for multi-variate regression (crimes.csv)  is : %f", rsquared)
 ```
 
-
+## Multivariate Regression - R code
 ```{python}
 import numpy as np
 import pandas as pd
@@ -117,8 +125,10 @@ print('R-squared score (test): {:.3f}'
      .format(linreg.score(X_test, y_test)))
 ```
 
-
-```{r b,message=FALSE, warning=FALSE}
+# Polynomial Regression - R 
+Using polynomials of degree 1,2 & 3
+```{r,message=FALSE, warning=FALSE}
+ # Polynommial depgree 1
 df=read.csv("auto_mpg.csv",stringsAsFactors = FALSE) # Data from UCI
 df1 <- as.data.frame(sapply(df,as.numeric))
 
@@ -127,11 +137,12 @@ df3 <- df2[complete.cases(df2),]
 train_idx <- trainTestSplit(df3,trainPercent=75,seed=5)
 train <- df3[train_idx, ]
 test <- df3[-train_idx, ]
-# Fit the 
+# Fit a model of degree 1
 fit <- lm(mpg~. ,data=train)
-Rsquared(fit,test,test$mpg)
+rsquared1 <-Rsquared(fit,test,test$mpg)
+sprintf("R-squared for Polynomial regression of degree 1 (auto_mpg.csv)  is : %f", rsquared1)
 
-#poly 2
+#Polynomial degree 2
 x = as.matrix(df3[1:6])
 # Make poly of total Data frame before split
 df4=as.data.frame(poly(x,2,raw=TRUE))
@@ -139,12 +150,13 @@ df5 <- cbind(df4,df3[7])
 train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
 train <- df5[train_idx, ]
 test <- df5[-train_idx, ]
-# Fir the 
+# Fit the model
 fit <- lm(mpg~. ,data=train)
-Rsquared(fit,test,test$mpg)
+rsquared2=Rsquared(fit,test,test$mpg)
+sprintf("R-squared for Polynomial regression of degree 2 (auto_mpg.csv)  is : %f", rsquared2)
 
-#####
-#poly 3
+
+#Polynomial degree 3
 x = as.matrix(df3[1:6])
 # Make poly of total Data frame before split
 df4=as.data.frame(poly(x,3,raw=TRUE))
@@ -152,10 +164,16 @@ df5 <- cbind(df4,df3[7])
 train_idx <- trainTestSplit(df5,trainPercent=75,seed=5)
 train <- df5[train_idx, ]
 test <- df5[-train_idx, ]
-# Fir the 
+# Fit the model
 fit <- lm(mpg~. ,data=train)
-Rsquared(fit,test,test$mpg)
+rsquared3=Rsquared(fit,test,test$mpg)
+sprintf("R-squared for Polynomial regression of degree 2 (auto_mpg.csv)  is : %f", rsquared3)
 
+df=data.frame(degree=c(1,2,3),Rsquared=c(rsquared1,rsquared2,rsquared3))
+
+ggplot(df,aes(x=degree,y=Rsquared)) +geom_point() + geom_line(color="blue") +
+    ggtitle("Polynomial regression - R squared vs Degree of polynomial") +
+    xlab("Degree") + ylab("R squared")
 ```
 
 
@@ -176,30 +194,57 @@ autoDF3=autoDF2.dropna()
 autoDF3.shape
 X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
 y=autoDF3['mpg']
-X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
 
-# Poly2
+# Polynomial degree 1
+X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
+linreg = LinearRegression().fit(X_train, y_train)
+print('R-squared score - Polynomial degree 1 (training): {:.3f}'
+     .format(linreg.score(X_train, y_train)))
+     
+rsquared1 =linreg.score(X_test, y_test)
+print('R-squared score - Polynomial degree 1 (test): {:.3f}'
+     .format(linreg.score(X_test, y_test)))
+
+# Polynomial degree 2
 poly = PolynomialFeatures(degree=2)
 X_poly = poly.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(X_poly, y,random_state = 0)
 linreg = LinearRegression().fit(X_train, y_train)
 
-print('(poly deg 2) R-squared score (training): {:.3f}'
+print('R-squared score - Polynomial degree 2 (training): {:.3f}'
      .format(linreg.score(X_train, y_train)))
-print('(poly deg 2) R-squared score (test): {:.3f}\n'
+
+rsquared2 =linreg.score(X_test, y_test)
+print('R-squared score - Polynomial degree 2 (test): {:.3f}\n'
      .format(linreg.score(X_test, y_test)))
 
-#Polynomial 3
+#Polynomial degree 3
 
 poly = PolynomialFeatures(degree=3)
 X_poly = poly.fit_transform(X)
 X_train, X_test, y_train, y_test = train_test_split(X_poly, y,random_state = 0)
 linreg = LinearRegression().fit(X_train, y_train)
-print('(poly deg 3) R-squared score (training): {:.3f}'
+print('(R-squared score -Polynomial degree 3  (training): {:.3f}'
      .format(linreg.score(X_train, y_train)))
-print('(poly deg 3) R-squared score (test): {:.3f}\n'
+     
+rsquared3 =linreg.score(X_test, y_test)
+print('R-squared score Polynomial degree 3 (test): {:.3f}\n'
      .format(linreg.score(X_test, y_test)))
+degree=[1,2,3]
+rsquared =[rsquared1,rsquared2,rsquared3]
+fig=plt.plot(degree,rsquared)
+fig=plt.title("Polynomial regression - R squared vs Degree of polynomial")
+fig=plt.xlabel("Degree")
+fig=plt.ylabel("R squared")
+fig.figure.savefig('foo.png', bbox_inches='tight')
+print "Finished plotting and saving"
 
+
+```
+
+
+Output image:
+![output](foo.png)
 ```
 
 
