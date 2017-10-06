@@ -336,13 +336,20 @@ df3 <- df2[complete.cases(df2),]
 train.X.scaled=MinMaxScaler(train.X)
 test.X.scaled=MinMaxScaler(test.X)
 
-knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=11)
-knnRSquared(knn$pred,test.Y)
-for(i in c(1,2,4,6,8,10,12,15,20,25,30)){
+
+rsquared <- NULL
+neighbors <-c(1,2,4,6,8,10,12,15,20,25,30)
+for(i in seq_along(neighbors)){
     knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=i)
-    a=knnRSquared(knn$pred,test.Y)
-    print(a)
+    rsquared[i]=knnRSquared(knn$pred,test.Y)
+    
 }
+
+df <- data.frame(neighbors,Rsquared=rsquared)
+
+ggplot(df,aes(x=neighbors,y=Rsquared)) + geom_point() +geom_line(color="blue") +
+    xlab("Number of neighbors") + ylab("R squared") +
+    ggtitle("KNN regression - R squared vs Number of Neighors(Normalized)")
 ```
 
 
@@ -373,10 +380,22 @@ X_train_scaled = scaler.fit_transform(X_train)
 # we must apply the scaling to the test set that we computed for the training set
 X_test_scaled = scaler.transform(X_test)
 
-for neighbors in [1,2,4,6,8,10,12,15,20,25,30]:
-    knnreg = KNeighborsRegressor(n_neighbors = neighbors).fit(X_train_scaled, y_train)
-
+rsquared=[]
+neighbors=[1,2,4,6,8,10,12,15,20,25,30]
+for i in neighbors:
+    knnreg = KNeighborsRegressor(n_neighbors = i).fit(X_train_scaled, y_train)
+    rsquared.append(knnreg.score(X_test_scaled, y_test))
     print('R-squared test score: {:.3f}'
         .format(knnreg.score(X_test_scaled, y_test)))
+
+fig=plt.plot(neighbors,rsquared)
+fig=plt.title("KNN regression - R squared vs Number of neighbors(Normalized)")
+fig=plt.xlabel("Neighbors")
+fig=plt.ylabel("R squared")
+fig.figure.savefig('foo.png', bbox_inches='tight')
+print "Finished plotting and saving"
 ```
 
+
+Output image:
+![output](foo.png)
