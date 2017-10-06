@@ -237,6 +237,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.neighbors import KNeighborsRegressor
 autoDF =pd.read_csv("auto_mpg.csv",encoding="ISO-8859-1")
 autoDF.shape
 autoDF.columns
@@ -246,7 +247,7 @@ autoDF3=autoDF2.dropna()
 autoDF3.shape
 X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
 y=autoDF3['mpg']
-from sklearn.neighbors import KNeighborsRegressor
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
 
@@ -255,5 +256,59 @@ for neighbors in [1,2,4,8,10,14,20]:
      #print(knnreg.predict(X_test))
      print('R-squared test score: {:.3f}'
         .format(knnreg.score(X_test, y_test)))
+```
+
+
+```{r}
+df=read.csv("auto_mpg.csv",stringsAsFactors = FALSE) # Data from UCI
+df1 <- as.data.frame(sapply(df,as.numeric))
+
+df2 <- df1 %>% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
+df3 <- df2[complete.cases(df2),]
+train.X.scaled=MinMaxScaler(train.X)
+test.X.scaled=MinMaxScaler(test.X)
+
+knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=11)
+knnRSquared(knn$pred,test.Y)
+for(i in c(1,2,4,6,8,10,12,15,20,25,30)){
+    knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=i)
+    a=knnRSquared(knn$pred,test.Y)
+    print(a)
+}
+```
+
+
+```{python}
+import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import MinMaxScaler
+autoDF =pd.read_csv("auto_mpg.csv",encoding="ISO-8859-1")
+autoDF.shape
+autoDF.columns
+autoDF1=autoDF[['mpg','cylinder','displacement','horsepower','weight','acceleration','year']]
+autoDF2 = autoDF1.apply(pd.to_numeric, errors='coerce')
+autoDF3=autoDF2.dropna()
+autoDF3.shape
+X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
+y=autoDF3['mpg']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+scaler = MinMaxScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+# we must apply the scaling to the test set that we computed for the training set
+X_test_scaled = scaler.transform(X_test)
+
+for neighbors in [1,2,4,6,8,10,12,15,20,25,30]:
+    knnreg = KNeighborsRegressor(n_neighbors = neighbors).fit(X_train_scaled, y_train)
+
+    print('R-squared test score: {:.3f}'
+        .format(knnreg.score(X_test_scaled, y_test)))
 ```
 

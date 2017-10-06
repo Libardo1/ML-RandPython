@@ -382,6 +382,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.neighbors import KNeighborsRegressor
 autoDF =pd.read_csv(&quot;auto_mpg.csv&quot;,encoding=&quot;ISO-8859-1&quot;)
 autoDF.shape
 autoDF.columns
@@ -391,7 +392,7 @@ autoDF3=autoDF2.dropna()
 autoDF3.shape
 X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
 y=autoDF3['mpg']
-from sklearn.neighbors import KNeighborsRegressor
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
 
@@ -407,6 +408,79 @@ for neighbors in [1,2,4,8,10,14,20]:
 ## R-squared test score: 0.683
 ## R-squared test score: 0.670
 ## R-squared test score: 0.668</code></pre>
+<pre class="r"><code>df=read.csv(&quot;auto_mpg.csv&quot;,stringsAsFactors = FALSE) # Data from UCI
+df1 &lt;- as.data.frame(sapply(df,as.numeric))</code></pre>
+<pre><code>## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion
+
+## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion
+
+## Warning in lapply(X = X, FUN = FUN, ...): NAs introduced by coercion</code></pre>
+<pre class="r"><code>df2 &lt;- df1 %&gt;% select(cylinder,displacement, horsepower,weight, acceleration, year,mpg)
+df3 &lt;- df2[complete.cases(df2),]
+train.X.scaled=MinMaxScaler(train.X)
+test.X.scaled=MinMaxScaler(test.X)
+
+knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=11)
+knnRSquared(knn$pred,test.Y)</code></pre>
+<pre><code>## [1] 0.8093414</code></pre>
+<pre class="r"><code>for(i in c(1,2,4,6,8,10,12,15,20,25,30)){
+    knn=knn.reg(train.X.scaled,test.X.scaled,train.Y,k=i)
+    a=knnRSquared(knn$pred,test.Y)
+    print(a)
+}</code></pre>
+<pre><code>## [1] 0.6162022
+## [1] 0.7395408
+## [1] 0.7830111
+## [1] 0.8050445
+## [1] 0.8030381
+## [1] 0.8090873
+## [1] 0.8132552
+## [1] 0.8139572
+## [1] 0.8024077
+## [1] 0.809205
+## [1] 0.8027476</code></pre>
+<pre class="python"><code>import numpy as np
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import MinMaxScaler
+autoDF =pd.read_csv(&quot;auto_mpg.csv&quot;,encoding=&quot;ISO-8859-1&quot;)
+autoDF.shape
+autoDF.columns
+autoDF1=autoDF[['mpg','cylinder','displacement','horsepower','weight','acceleration','year']]
+autoDF2 = autoDF1.apply(pd.to_numeric, errors='coerce')
+autoDF3=autoDF2.dropna()
+autoDF3.shape
+X=autoDF3[['cylinder','displacement','horsepower','weight','acceleration','year']]
+y=autoDF3['mpg']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 0)
+scaler = MinMaxScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+# we must apply the scaling to the test set that we computed for the training set
+X_test_scaled = scaler.transform(X_test)
+
+for neighbors in [1,2,4,6,8,10,12,15,20,25,30]:
+    knnreg = KNeighborsRegressor(n_neighbors = neighbors).fit(X_train_scaled, y_train)
+
+    print('R-squared test score: {:.3f}'
+        .format(knnreg.score(X_test_scaled, y_test)))</code></pre>
+<pre><code>## R-squared test score: 0.703
+## R-squared test score: 0.810
+## R-squared test score: 0.830
+## R-squared test score: 0.838
+## R-squared test score: 0.834
+## R-squared test score: 0.828
+## R-squared test score: 0.827
+## R-squared test score: 0.826
+## R-squared test score: 0.816
+## R-squared test score: 0.815
+## R-squared test score: 0.809</code></pre>
 
 
 
