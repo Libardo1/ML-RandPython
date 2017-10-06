@@ -1,38 +1,64 @@
 ---
-title: "RandPython"
+title: "Practical Machine Learning with R and Python - Part 1"
 author: "Tinniam V Ganesh"
 date: "October 3, 2017"
 output:
   html_document: default
   word_document: default
 ---
-## Univariate Regression - R code
+# Introduction
+This is the 1st part of a series of posts I intend to write on some common Machine Learning
+Algorithms in R and Python. In this first part I cover the following Machine Learning Algorithms
 
+- Univariate Regression
+- Multivariate Regression
+- Polynomial Regression
+- K Nearest Neighbors Regression
 
+The code includes the implementation in both R and Python. This series of posts are based 
+on the following 2 MOOC courses I did at Stanford Online and at Coursera
 
+1. [Statistical Learning](https://lagunita.stanford.edu/courses/HumanitiesandScience/StatLearning/Winter2015/about), Prof Trevor Hastie & Prof Robert Tibesherani, Online Stanford
+2. [Applied Machine Learning in Python](https://www.coursera.org/learn/python-machine-learning) Prof Kevyn-Collin Thomson, University Of Michigan, Coursera
+
+I have used the data sets from [UCI Machine Learning repository](https://archive.ics.uci.edu/ml/datasets.html)([Communities and Crime](https://archive.ics.uci.edu/ml/datasets/Communities+and+Crime) and [Auto MPG](https://archive.ics.uci.edu/ml/datasets/Auto+MPG)). I also use the Boston data set from MASS package
+
+While coding in R and Python I found that there were some aspects that were more convenient in one language and some in the other. For example, plotting the fit in R is straightforward in R, while computing the R squared, splitting as Train & Test sets etc. are already available in Python. In any case, these minor inconveniences can be easily be implemented in either language.
+
+##1 Univariate Regression - R code
+Here a simple linear regression line is fitted between a single input feature and the target
+variable
 ```{r}
+# Source in the R function library
 source("RFunctions.R")
+# Read the Boston data file
+df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - Statistical Learning
 
-df=read.csv("Boston.csv",stringsAsFactors = FALSE) # Data from MASS - SL
+# Split the data into training and test sets (75:25)
 train_idx <- trainTestSplit(df,trainPercent=75,seed=5)
 train <- df[train_idx, ]
 test <- df[-train_idx, ]
 
-
+# Fit a linear regression line between 'Median value of owner occupied homes' vs 'lower status of 
+# population'
 fit=lm(medv~lstat,data=df)
-fit
+# Display details of fir
 summary(fit)
+# Display the confidence intervals
 confint(fit)
-plot(df$lstat,df$medv)
+
+plot(df$lstat,df$medv, xlab="Lower status (%)",ylab="Median value of owned homes ($1000)", main="Median value of homes ($1000) vs Lowe status (%)")
 abline(fit)
 abline(fit,lwd=3)
 abline(fit,lwd=3,col="red")
+
+rsquared=Rsquared(fit,test,test$medv)
+sprintf("R-squared for uni-variate regression (Boston.csv)  is : %f", rsquared)
 ```
 
 
 ## Univariate Regression - Python code
 
-## R code
 ```{python}
 import numpy as np
 import pandas as pd
@@ -40,26 +66,29 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-os.chdir("C:\\software\\machine-learning\\RandPython")
+#os.chdir("C:\\software\\machine-learning\\RandPython")
+
+# Read the CSV file
 df = pd.read_csv("Boston.csv",encoding = "ISO-8859-1")
+# Select the feature variable
 X=df['lstat']
+
+# Select the target 
 y=df['medv']
+
+# Split into train and test sets (75:25)
 X_train, X_test, y_train, y_test = train_test_split(X, y,random_state = 0)
 X_train=X_train.values.reshape(-1,1)
 X_test=X_test.values.reshape(-1,1)
 
-
+# Fit a linear model
 linreg = LinearRegression().fit(X_train, y_train)
-print('linear model coeff (w): {}'
-     .format(linreg.coef_))
-print('linear model intercept (b): {:.3f}'
-     .format(linreg.intercept_))
-print('R-squared score (training): {:.3f}'
-     .format(linreg.score(X_train, y_train)))
-print('R-squared score (test): {:.3f}'
-     .format(linreg.score(X_test, y_test)))
-     
 
+# Print the training and test R squared score
+print('R-squared score (training): {:.3f}'.format(linreg.score(X_train, y_train)))
+print('R-squared score (test): {:.3f}'.format(linreg.score(X_test, y_test)))
+     
+# Plot the linear regression line
 fig=plt.scatter(X_train,y_train)
 plt.plot()
 # Create a range of points. Compute yhat=coeff1*x + intercept and plot

@@ -37,6 +37,8 @@ names(fit)
 coef(fit)
 confint(fit)
 
+Rsquared(fit,test,test$medv)
+
 predict(fit,data.frame(lstat=(c(5,10,15))), interval="confidence")
 predict(fit,data.frame(lstat=(c(5,10,15))), interval="prediction")
 plot(df$lstat,df$medv)
